@@ -306,6 +306,14 @@ class IvLLM(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=std)
 
+    def get_hidden(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Return final normalized hidden states without projecting to vocab. Shape: (B, T, D)."""
+        x = self.embeddings(tokens)
+        v_first: torch.Tensor | None = None
+        for block in self.blocks:
+            x, v_first = block(x, self.rope, v_first)
+        return self.final_norm(x)
+
     def forward(self, tokens: torch.Tensor, targets: torch.Tensor = None):
         x = self.embeddings(tokens)
         v_first: torch.Tensor | None = None
