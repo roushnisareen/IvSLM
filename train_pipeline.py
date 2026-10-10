@@ -25,7 +25,7 @@ import argparse
 import torch
 
 CKPTS = {
-    "base": "checkpoints/ivllm_latest.pt",
+    "base": "checkpoints/ivllm_base.pt",
     "sft":  "checkpoints/ivllm_sft.pt",
     "jepa": "checkpoints/ivllm_jepa.pt",
     "rm":   "checkpoints/ivllm_rm.pt",
@@ -111,7 +111,7 @@ def main():
         help="Which stage to run (default: all)",
     )
     parser.add_argument("--base-ckpt", default=CKPTS["base"],
-                        help="Pre-trained base model checkpoint")
+                        help="Pre-trained base checkpoint (run download_base.py first)")
     parser.add_argument("--wandb", action="store_true", help="Enable W&B logging")
 
     # SFT

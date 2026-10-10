@@ -21,7 +21,7 @@ import argparse
 import torch
 import tiktoken
 
-from ivllm import IvLLM, SEQ_LENGTH, device
+from base_model import IvLLM, SEQ_LENGTH, device
 from generate import generate, encode, decode
 from jepa import LanguageJEPA
 

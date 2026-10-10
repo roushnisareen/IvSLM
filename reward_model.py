@@ -18,7 +18,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import tiktoken
 
-from ivllm import IvLLM, DIM, device
+from base_model import IvLLM, DIM, device
 
 enc = tiktoken.get_encoding("gpt2")
 RM_CHECKPOINT = "checkpoints/ivllm_rm.pt"

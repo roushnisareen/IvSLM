@@ -16,7 +16,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from einops import rearrange
 
-from ivllm import IvLLM, SEQ_LENGTH, device
+from base_model import IvLLM, SEQ_LENGTH, device
 from sft_data import InstructionDataset, sft_collate
 
 SFT_CHECKPOINT = "checkpoints/ivllm_sft.pt"

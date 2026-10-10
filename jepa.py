@@ -23,7 +23,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import tiktoken
 
-from ivllm import IvLLM, RMSNorm, DIM, SEQ_LENGTH, device
+from base_model import IvLLM, DIM, SEQ_LENGTH, device
 
 enc = tiktoken.get_encoding("gpt2")
 
@@ -39,28 +39,19 @@ MAX_ENC_LEN = 512       # max tokens fed to encoders (separate from generation c
 class SequenceEncoder(nn.Module):
     """
     Mean-pooled sequence encoder built from a deep-copied IvLLM.
+    Uses model.get_hidden() so it is architecture-agnostic.
     Produces a fixed-size vector from a variable-length token sequence.
     """
 
     def __init__(self, base_model: IvLLM):
         super().__init__()
-        # Deep copy so encoder weights are independent from the policy
-        m = copy.deepcopy(base_model)
-        self.embeddings = m.embeddings
-        self.rope = m.rope
-        self.blocks = m.blocks
-        self.norm = m.final_norm
+        self.model = copy.deepcopy(base_model)
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         """tokens: (B, T) → repr: (B, D)"""
-        x = self.embeddings(tokens)
-        v_first = None
-        for block in self.blocks:
-            x, v_first = block(x, self.rope, v_first)
-        x = self.norm(x)
-        # Mean pool, ignoring padding zeros
+        hidden = self.model.get_hidden(tokens)              # (B, T, D)
         mask = (tokens != 0).float().unsqueeze(-1)          # (B, T, 1)
-        return (x * mask).sum(dim=1) / mask.sum(dim=1).clamp(min=1)  # (B, D)
+        return (hidden * mask).sum(dim=1) / mask.sum(dim=1).clamp(min=1)  # (B, D)
 
 
 class JEPAPredictor(nn.Module):

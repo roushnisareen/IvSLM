@@ -28,7 +28,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 import tiktoken
 
-from ivllm import IvLLM, SEQ_LENGTH, device
+from base_model import IvLLM, SEQ_LENGTH, device
 from generate import generate, compute_log_probs, encode
 from reward_model import RewardModel
 from jepa import LanguageJEPA
