@@ -4,7 +4,7 @@ and save them as a PyTorch checkpoint ready for SFT/JEPA/RM/GRPO.
 
 Usage:
     python download_base.py
-    python download_base.py --model-id roushnisareen/ivllm-671m-fineweb12b
+    python download_base.py --model-id Samarth0710/ivllm-671m-fineweb12b
     python download_base.py --local release/ivllm-671m-fineweb12b/model.safetensors
 """
 import os
@@ -15,7 +15,7 @@ from safetensors.torch import load_file
 CHECKPOINT_DIR = "checkpoints"
 OUTPUT_PATH = os.path.join(CHECKPOINT_DIR, "ivllm_base.pt")
 
-DEFAULT_MODEL_ID = "roushnisareen/ivllm-671m-fineweb12b"
+DEFAULT_MODEL_ID = "Samarth0710/ivllm-671m-fineweb12b"
 
 
 def download_from_hub(model_id: str) -> dict:
@@ -65,7 +65,7 @@ def convert_and_save(state_dict: dict, output_path: str):
 def main():
     parser = argparse.ArgumentParser(description="Download IvLLM 671M pretrained weights")
     parser.add_argument("--model-id", default=DEFAULT_MODEL_ID,
-                        help="HuggingFace model ID (default: roushnisareen/ivllm-671m-fineweb12b)")
+                        help="HuggingFace model ID (default: Samarth0710/ivllm-671m-fineweb12b)")
     parser.add_argument("--local", default=None,
                         help="Path to a local model.safetensors file (skips HF download)")
     parser.add_argument("--output", default=OUTPUT_PATH,

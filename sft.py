@@ -38,6 +38,8 @@ def train_sft(
     grad_accum: int = 8,
     max_samples: int = 50000,
     wandb_enabled: bool = False,
+    dataset=None,
+    output_path: str = SFT_CHECKPOINT,
 ) -> IvLLM:
     model = IvLLM().to(device)
 
@@ -50,7 +52,8 @@ def train_sft(
 
     model = torch.compile(model, dynamic=False)
 
-    dataset = InstructionDataset(max_seq_len=SEQ_LENGTH, max_samples=max_samples)
+    if dataset is None:
+        dataset = InstructionDataset(max_seq_len=SEQ_LENGTH, max_samples=max_samples)
     loader = DataLoader(
         dataset, batch_size=batch_size, shuffle=True,
         collate_fn=sft_collate, num_workers=2, pin_memory=True,
@@ -109,11 +112,11 @@ def train_sft(
                     if wandb_run:
                         wandb_run.log({"sft/loss": loss.item(), "sft/lr": new_lr}, step=global_step)
 
-    os.makedirs("checkpoints", exist_ok=True)
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     # Save the underlying raw module (unwrap compile wrapper)
     raw = getattr(model, "_orig_mod", model)
-    torch.save({"model_state_dict": raw.state_dict(), "global_step": global_step}, SFT_CHECKPOINT)
-    print(f"SFT checkpoint saved → {SFT_CHECKPOINT}")
+    torch.save({"model_state_dict": raw.state_dict(), "global_step": global_step}, output_path)
+    print(f"SFT checkpoint saved → {output_path}")
     if wandb_run:
         wandb_run.finish()
     return raw

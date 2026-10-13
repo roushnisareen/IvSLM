@@ -60,9 +60,29 @@ class InstructionDataset(Dataset):
         return torch.tensor(ids, dtype=torch.long), torch.tensor(mask, dtype=torch.bool)
 
 
+class PairDataset(InstructionDataset):
+    """Like InstructionDataset, but built from ((instruction, input), response) pairs."""
+
+    def __init__(self, pairs: list, max_seq_len: int = 2048):
+        self.examples = []
+        for (instruction, input_text), response in pairs:
+            prompt_ids = enc.encode(format_instruction(instruction, input_text))
+            response_ids = enc.encode(response) + [EOT]
+            full_ids = prompt_ids + response_ids
+            if len(full_ids) > max_seq_len:
+                continue
+            loss_mask = [0] * len(prompt_ids) + [1] * len(response_ids)
+            self.examples.append((full_ids, loss_mask))
+
+        print(f"PairDataset: {len(self.examples)} examples")
+
+
 def sft_collate(batch):
     ids_list, mask_list = zip(*batch)
     max_len = max(t.size(0) for t in ids_list)
+    # Round the model input length (max_len - 1) up to a multiple of 256 so
+    # torch.compile sees a handful of shapes instead of recompiling every batch
+    max_len = -(-(max_len - 1) // 256) * 256 + 1
     B = len(batch)
     ids_pad = torch.zeros(B, max_len, dtype=torch.long)
     mask_pad = torch.zeros(B, max_len, dtype=torch.bool)
