@@ -249,7 +249,7 @@ def sft_math(epochs: int = 2, lr: float = 2e-5, batch_size: int = 4,
     volumes={VOLUME_PATH: volume},
     timeout=3600 * 2,
 )
-def compare(checkpoints: str = "ivllm_base.pt,ivllm_sft.pt,ivllm_sft_math.pt",
+def compare(checkpoints: str = "ivllm_base.pt,ivllm_sft.pt,ivllm_sft_math_v2.pt",
             n_loss: int = 300, n_arith: int = 200, n_gsm: int = 200):
     import sys, json, torch
     import torch.nn.functional as F
